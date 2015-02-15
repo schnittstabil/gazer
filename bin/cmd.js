@@ -2,18 +2,11 @@
 var gazer = require('../');
 
 var argv = require('yargs')
-  .usage('Usage: gazer -p "**/*.js" <your command>')
+  .usage('Usage: gazer -p "**/*.js" -- <your command>')
   .demand('p')
+  .demand(1, 'You must provide a command to run')
   .alias('p', 'pattern')
   .describe('p', 'Files to watch, globbing supported')
   .argv;
 
-var pattern = argv.pattern;
-var patternIndex = process.argv.indexOf(pattern) + 1;
-var cmd = process.argv.slice(patternIndex, Infinity).join(' ');
-
-if (cmd.length === 0) {
-  throw new Error('You must provide a command to run');
-}
-
-gazer(pattern, cmd);
+gazer(argv.pattern, argv._[0], argv._.slice(1));

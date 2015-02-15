@@ -30,11 +30,42 @@ $ npm install -g gazer
 ## Usage
 
 ```shell
-$ gazer --pattern "readme.md" echo "blorp"
+$ gazer --pattern 'README.md' echo 'blorp'
 
-[readme.md changes]
+[README.md changes]
 
-> "blorp"
+> 'blorp'
+```
+
+### Double dash
+
+If you need to pass an option (e.g. `-e`) to the command you're running, use
+`--` to separate the option arguments from the positional arguments:
+
+```shell
+$ gazer -p README.md -- node -e 'console.log("blorp");'
+```
+
+This feature is provided [for free](http://c2.com/cgi/wiki?ForFree)
+by [yargs](https://github.com/chevex/yargs).
+
+
+### Multiple patterns
+
+[gaze](https://github.com/shama/gaze#usage) accepts an array of patterns, so do `gazer`.
+
+```javascript
+gaze(['**/*.js', '!node_modules/**/*'], function() {
+  console.log('blorp');
+});
+```
+
+```shell
+$ gazer --pattern '**/*.js' --pattern '!node_modules/**/*' -- echo 'blorp'
+
+[index.js changes]
+
+> 'blorp'
 ```
 
 ### Arbitrary watch tasks with npm run
@@ -60,16 +91,4 @@ And then start the watcher:
 ```shell
 $ npm run watch-less
 ```
-
-### Double dash
-
-If you need to pass a -p argument to the command you're running, use
-`--` to separate the option arguments from the positional arguments:
-
-```shell
-$ gazer -p readme.md -- echo -p
-```
-
-This feature is provided [for free](http://c2.com/cgi/wiki?ForFree)
-by [optimist](https://github.com/substack/node-optimist).
 

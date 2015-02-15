@@ -2,10 +2,11 @@ var exec = require('child_process').exec;
 var gaze = require('gaze');
 var debounce = require('lodash.debounce');
 
-module.exports = function(pattern, cmd){
+module.exports = function(pattern, cmd, args){
   function runner(event, filepath){
-    console.log('Running: '+ cmd);
-    exec(cmd, function(err, stdout, stderr){
+    var command = cmd + ' ' + args.join(' ');
+    console.log('Running: '+ command);
+    exec(command, function(err, stdout, stderr){
       if (err) {
         console.log(err);
       }

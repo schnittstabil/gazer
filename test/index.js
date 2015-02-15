@@ -7,7 +7,7 @@ describe('gazer', function(){
   var compile = './node_modules/.bin/lessc --verbose example/foo.less example/foo.css';
 
   it('should watch files and run a command', function(done){
-    var cmd = ['./bin/cmd.js --pattern', pattern, compile];
+    var cmd = ['./bin/cmd.js --pattern', pattern, '--', compile];
     var child = exec(cmd.join(' '), function(err, stdout, stderr){
       if (err) {
         assert.ok(false, err);
