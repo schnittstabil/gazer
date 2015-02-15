@@ -12,14 +12,14 @@
   "author": "wookiehangover",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "gaze": "~0.4.3",
-    "lodash.debounce": "~2.4.1",
-    "optimist": "~0.6.0"
+    "gaze": "~0.5.1",
+    "lodash.debounce": "~3.0.1",
+    "yargs": "~3.0.4"
   },
   "devDependencies": {
-    "chai": "~1.8.1",
-    "mocha": "~1.16.2",
-    "less": "~1.6.0"
+    "chai": "~2.0.0",
+    "less": "^2.4.0",
+    "mocha": "~2.1.0"
   },
   "directories": {
     "example": "example",
