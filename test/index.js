@@ -17,7 +17,6 @@ describe('gazer', function(){
 
     child.stdout.on('data', function(data){
       if (/Watching/.test(data)) {
-        console.log(data.trim(), 'Watching "example/foo.less" : 1 file');
         assert.equal(data.trim(), 'Watching "example/foo.less" : 1 file');
         process.nextTick(function(){
           exec('echo "* { color: black }" > example/foo.less');
@@ -31,4 +30,25 @@ describe('gazer', function(){
     });
   });
 
+  it('should handle mixed quotations of diffrent types correctly', function(done) {
+    var cmd = './bin/cmd.js -p example/foo.less -- node -e \'console.log("blorp");\'';
+    var child = exec(cmd, function(err, stdout, stderr){
+      if (err) {
+        assert.notOk(err, err);
+        done();
+      }
+    });
+
+    child.stdout.on('data', function(data){
+      if (/Watching/.test(data)) {
+        process.nextTick(function(){
+          exec('echo "* { color: black }" > example/foo.less');
+        });
+      }
+
+      if (/^blorp\n/.test(data)) {
+        done();
+      }
+    });
+  });
 });

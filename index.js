@@ -1,18 +1,11 @@
-var exec = require('child_process').exec;
+var spawn = require('child_process').spawn;
 var gaze = require('gaze');
 var debounce = require('lodash.debounce');
 
 module.exports = function(pattern, cmd, args){
   function runner(event, filepath){
-    var command = cmd + ' ' + args.join(' ');
-    console.log('Running: '+ command);
-    exec(command, function(err, stdout, stderr){
-      if (err) {
-        console.log(err);
-      }
-      console.log(stdout);
-      console.log(stderr);
-    });
+    console.log('Running: '+ cmd + ' ' + args.join(' '));
+    spawn(cmd, args, { stdio: 'inherit' });
   }
 
   gaze(pattern, function(err, watcher){
