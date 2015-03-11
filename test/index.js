@@ -4,79 +4,81 @@ var exec = childProcess.exec;
 var spawn = childProcess.spawn;
 var CLI = './bin/cmd.js';
 
+function Listener(cmd, args, onClose) {
+  this.capture = {
+    stderr: '',
+    stdout: '',
+  };
+  this.state = '';
+  this.sut = spawn(cmd, args);
+  this.sut.stderr.on('data', this.listen.bind(this, 'stderr'));
+  this.sut.stdout.on('data', this.listen.bind(this, 'stdout'));
+  this.sut.on('close', onClose.bind(this));
+}
+
+Listener.prototype.listen = function(stream, data) {
+  this.capture[stream] += String(data);
+  if (this.state === '') {
+    if (/Watching/.test(this.capture.stderr)) {
+      this.state = 'Watching';
+      if (this.onWatching) {
+        this.onWatching();
+      }
+    }
+  }
+  if(this.state === 'Watching') {
+    if (/Running:/.test(this.capture.stderr)) {
+      this.state = 'Running';
+    }
+  }
+  if (this.state === 'Running' && this.onRunning) {
+    this.onRunning();
+  }
+}
+
 describe('gazer-color', function() {
 
   it('should watch files and run a command', function(done) {
-    var PATTERN = 'example/*.less';
-    var stdout = '';
-    var stderr = '';
-    var sut = spawn('node', [CLI, '--pattern', PATTERN, '--', 'echo', 'blorp']);
-    var state = '';
-    sut.stderr.on('data', function(data) {
-      stderr += String(data);
-    });
-    sut.stdout.on('data', function(data) {
-      stdout += String(data);
-      switch(state) {
-      case '':
-        if (/Watching/.test(stdout)) {
-          state = 'Watching';
-          process.nextTick(function() {
-            exec('echo "* { color: black }" > example/foo.less');
-          });
-        }
-      case 'Watching':
-        if (/Running/.test(stdout)) {
-          state = 'Running';
-        }
-      case 'Running':
-        if (/echo blorp[^]*blorp/.test(stdout)) {
-          state = 'DONE';
-          sut.kill();
-        }
+    var listener = new Listener('node',
+      [CLI, '--pattern', 'example/*.less', '--', 'echo', 'blorp'],
+      function() {
+        assert.strictEqual(this.capture.stdout.trim(), 'blorp');
+        assert.strictEqual(this.state, 'Closing');
+        done();
       }
-    });
-    sut.on('close', function() {
-      assert.strictEqual(stderr, '');
-      assert.strictEqual(state, 'DONE');
-      done();
-    });
+    );
+    listener.onWatching = function() {
+      process.nextTick(function() {
+        exec('echo "* { color: black }" > example/foo.less');
+      });
+    }
+    listener.onRunning = function() {
+      if (/^blorp$/m.test(this.capture.stdout)) {
+        this.state = 'Closing';
+        this.sut.kill();
+      }
+    }
   });
 
   it('should handle mixed quotations of diffrent types correctly', function(done) {
-    var PATTERN = 'example/*.less';
-    var state = ''
-    var stdout = '';
-    var stderr = '';
-    var sut = spawn('node', [CLI, '--pattern', PATTERN, '--', 'node', '-e', 'console.log("blorp");']);
-    sut.stderr.on('data', function(data) {
-      stderr += String(data);
-    });
-    sut.stdout.on('data', function(data) {
-      stdout += String(data);
-      switch(state) {
-      case '':
-        if (/Watching/.test(stdout)) {
-          state = 'Watching';
-          process.nextTick(function() {
-            exec('echo "* { color: black }" > example/foo.less');
-          });
-        }
-      case 'Watching':
-        if (/Running/.test(stdout)) {
-          state = 'Running';
-        }
-      case 'Running':
-        if (/blorp[^]*blorp/.test(stdout)) {
-          state = 'DONE';
-          sut.kill('SIGTERM');
-        }
+    var listener = new Listener('node',
+      [CLI, '--pattern', 'example/*.less', '--', 'node', '-e', 'console.log("blorp");'],
+      function() {
+        assert.strictEqual(this.capture.stdout.trim(), 'blorp');
+        assert.strictEqual(this.state, 'Closing');
+        done();
       }
-    });
-    sut.on('close', function() {
-      assert.strictEqual(stderr, '');
-      assert.strictEqual(state, 'DONE');
-      done();
-    });
+    );
+    listener.onWatching = function() {
+      process.nextTick(function() {
+        exec('echo "* { color: black }" > example/foo.less');
+      });
+    }
+    listener.onRunning = function() {
+      if (/^blorp$/m.test(this.capture.stdout)) {
+        this.state = 'Closing';
+        this.sut.kill();
+      }
+    }
   });
 });

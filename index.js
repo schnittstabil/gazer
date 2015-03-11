@@ -1,6 +1,8 @@
 var spawn = require('child_process').spawn;
 var gaze = require('gaze');
 var debounce = require('lodash.debounce');
+var path = require('path');
+var log = require('npmlog');
 
 module.exports = function(pattern, cmd, args, opts) {
   opts = opts || {};
@@ -18,11 +20,13 @@ module.exports = function(pattern, cmd, args, opts) {
 
     var fileCount = Object.keys(this.watched()).length;
 
-    console.log('Watching "'+ pattern +'" : ' +
+    log.info('gazer-color', 'Watching "'+ pattern +'" : ' +
                 fileCount +' file'+ (fileCount > 1 ? 's' : ''));
 
     this.on('all', debounce(function runner(event, filepath) {
-      console.log('Running: '+ cmd + ' ' + args.join(' '));
+      filepath = path.relative(process.cwd(), filepath);
+      log.info('gazer-color', filepath + ' ' + event);
+      log.info('gazer-color', 'Running: '+ cmd + ' ' + args.join(' '));
       spawn(cmd, args, spawnOpts);
     }, 100));
   });

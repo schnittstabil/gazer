@@ -21,10 +21,11 @@
   "dependencies": {
     "gaze": "^0.5.1",
     "lodash.debounce": "^3.0.1",
+    "npmlog": "^1.2.0",
     "yargs": "^3.5.3"
   },
   "devDependencies": {
-    "mocha": "~2.2.1"
+    "mocha": "^2.2.1"
   },
   "directories": {
     "example": "example",
