@@ -9,4 +9,15 @@ var argv = require('yargs')
   .describe('p', 'Files to watch, globbing supported')
   .argv;
 
-gazer(argv.pattern, argv._[0], argv._.slice(1));
+var pattern = argv.pattern;
+var cmd = argv._[0];
+var args = argv._.slice(1);
+var opts = argv;
+
+// delete non gazer options
+delete opts.pattern;
+delete opts.p;
+delete opts._;
+delete opts.$0;
+
+gazer(pattern, cmd, args, opts);

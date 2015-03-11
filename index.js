@@ -2,20 +2,16 @@ var spawn = require('child_process').spawn;
 var gaze = require('gaze');
 var debounce = require('lodash.debounce');
 
-module.exports = function(pattern, cmd, args){
-  var opts = { stdio: 'inherit' };
+module.exports = function(pattern, cmd, args, opts) {
+  opts = opts || {};
+  var spawnOpts = { stdio: 'inherit' };
   if (process.platform === 'win32') {
     args = ['/c', '"' + cmd + '"'].concat(args)
     cmd = 'cmd'
-    opts.windowsVerbatimArguments = true
+    spawnOpts.windowsVerbatimArguments = true
   }
 
-  function runner(event, filepath){
-    console.log('Running: '+ cmd + ' ' + args.join(' '));
-    spawn(cmd, args, opts);
-  }
-
-  gaze(pattern, function(err, watcher){
+  gaze(pattern, opts, function(err, watcher) {
     if (err) {
       throw new Error(err);
     }
@@ -25,7 +21,10 @@ module.exports = function(pattern, cmd, args){
     console.log('Watching "'+ pattern +'" : ' +
                 fileCount +' file'+ (fileCount > 1 ? 's' : ''));
 
-    this.on('all', debounce(runner, 100));
+    this.on('all', debounce(function runner(event, filepath) {
+      console.log('Running: '+ cmd + ' ' + args.join(' '));
+      spawn(cmd, args, spawnOpts);
+    }, 100));
   });
 };
 
