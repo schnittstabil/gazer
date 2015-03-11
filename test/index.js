@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 var exec = require('child_process').exec;
 
-describe('gazer', function(){
+describe('gazer-color', function(){
 
   var pattern = 'example/*.less';
   var compile = './node_modules/.bin/lessc --verbose example/foo.less example/foo.css';

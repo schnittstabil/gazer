@@ -1,15 +1,22 @@
 {
-  "name": "gazer",
+  "name": "gazer-color",
   "version": "0.0.3",
-  "description": "Watch some files, do a thing",
+  "description": "Watch some files, do a thing - a gazer fork capable of color output",
   "main": "index.js",
   "bin": {
-    "gazer": "bin/cmd.js"
+    "gazer-color": "bin/cmd.js"
   },
   "scripts": {
-    "test": "mocha test --timeout 5000"
+    "test": "mocha test --timeout 5000",
+    "watch-test": "node bin/cmd.js -p '**/*' -p '!node_modules/**/*' -p '!test/**/*' -- npm run test"
   },
   "author": "wookiehangover",
+  "contributors": [
+    {
+      "name": "Michael Mayer",
+      "email": "michael@schnittstabil.de"
+    }
+  ],
   "license": "BSD-2-Clause",
   "dependencies": {
     "gaze": "~0.5.1",
@@ -27,14 +34,24 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/wookiehangover/gazer.git"
+    "url": "git@github.com:schnittstabil/gazer-color.git"
   },
   "bugs": {
-    "url": "https://github.com/wookiehangover/gazer/issues"
+    "url": "https://github.com/schnittstabil/gazer-color/issues"
   },
-  "homepage": "https://github.com/wookiehangover/gazer",
+  "homepage": "https://github.com/schnittstabil/gazer-color",
   "keywords": [
+    "bin",
+    "cli",
+    "cmd",
     "watch",
-    "build"
+    "watcher",
+    "watching",
+    "fs",
+    "file",
+    "files",
+    "directory",
+    "directories",
+    "glob"
   ]
 }
