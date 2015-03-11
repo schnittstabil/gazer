@@ -62,7 +62,7 @@ describe('gazer-color', function() {
 
   it('should handle mixed quotations of diffrent types correctly', function(done) {
     var listener = new Listener('node',
-      [CLI, '--pattern', 'example/*.less', '--', 'node', '-e', 'console.log("blorp");'],
+      [CLI, '--pattern', 'example/*.less', '--', 'node', '-e', 'console.log(\'blorp\');'],
       function() {
         assert.strictEqual(this.capture.stdout.trim(), 'blorp');
         assert.strictEqual(this.state, 'Closing');

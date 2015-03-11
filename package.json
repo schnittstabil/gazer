@@ -7,8 +7,8 @@
     "gazer-color": "bin/cmd.js"
   },
   "scripts": {
-    "test": "mocha test --timeout 5000",
-    "watch-test": "node bin/cmd.js -p '**/*' -p '!node_modules/**/*' -p '!example/**/*' -- npm run test"
+    "test": "mocha test --timeout 20000",
+    "watch-test": "node bin/cmd.js -p \"**/*\" -p \"!node_modules/**/*\" -p \"!example/**/*\" -- npm run test"
   },
   "author": "wookiehangover",
   "contributors": [

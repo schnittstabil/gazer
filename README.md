@@ -9,33 +9,21 @@ command when files change. Like
 
 ## Installation
 
-This works best as a `devDependency` in the project you plan to use it
-in:
-
 ```shell
 $ npm install --save-dev gazer-color
-```
-
-You can easily invoke `gazer-color` with `npm run` via npm scripts that you
-set up in your package.json. See the usage example below for more
-details.
-
-If you want to use this everywhere, across multipe projects, you can install it
-globally, too:
-
-```shell
+# or
 $ npm install -g gazer-color
 ```
 
 ## Usage
 
 ```shell
-$ gazer-color --pattern 'README.md' -- echo 'blorp'
+$ gazer-color --pattern README.md -- echo blorp
 # note the -- between the gazer-color arguments like --patern and the command and its arguments
 
 [README.md changes]
 
-> 'blorp'
+> blorp
 ```
 
 ### Multiple patterns
@@ -49,11 +37,11 @@ gaze(['**/*.js', '!node_modules/**/*'], function() {
 ```
 
 ```shell
-$ gazer-color --pattern '**/*.js' --pattern '!node_modules/**/*' -- echo 'blorp'
+$ gazer-color --pattern "**/*.js" --pattern "!node_modules/**/*" -- echo blorp
 
 [index.js changes]
 
-> 'blorp'
+> blorp
 ```
 
 ### Arbitrary watch tasks with npm run
@@ -69,7 +57,7 @@ changes:
 {
   "scripts": {
     "test": "mocha",
-    "watch-test": "gazer-color -p 'public/less/**/*.less' -- npm run test"
+    "watch-test": "gazer-color -p \"public/less/**/*.less\" -- npm run test"
   }
 }
 ```
