@@ -1,54 +1,82 @@
-var assert = require('chai').assert;
-var exec = require('child_process').exec;
+var assert = require('assert');
+var childProcess = require('child_process');
+var exec = childProcess.exec;
+var spawn = childProcess.spawn;
+var CLI = './bin/cmd.js';
 
-describe('gazer-color', function(){
+describe('gazer-color', function() {
 
-  var pattern = 'example/*.less';
-  var compile = './node_modules/.bin/lessc --verbose example/foo.less example/foo.css';
-
-  it('should watch files and run a command', function(done){
-    var cmd = ['./bin/cmd.js --pattern', pattern, '--', compile];
-    var child = exec(cmd.join(' '), function(err, stdout, stderr){
-      if (err) {
-        assert.ok(false, err);
-        done();
+  it('should watch files and run a command', function(done) {
+    var PATTERN = 'example/*.less';
+    var stdout = '';
+    var stderr = '';
+    var sut = spawn('node', [CLI, '--pattern', PATTERN, '--', 'echo', 'blorp']);
+    var state = '';
+    sut.stderr.on('data', function(data) {
+      stderr += String(data);
+    });
+    sut.stdout.on('data', function(data) {
+      stdout += String(data);
+      switch(state) {
+      case '':
+        if (/Watching/.test(stdout)) {
+          state = 'Watching';
+          process.nextTick(function() {
+            exec('echo "* { color: black }" > example/foo.less');
+          });
+        }
+      case 'Watching':
+        if (/Running/.test(stdout)) {
+          state = 'Running';
+        }
+      case 'Running':
+        if (/echo blorp[^]*blorp/.test(stdout)) {
+          state = 'DONE';
+          sut.kill();
+        }
       }
     });
-
-    child.stdout.on('data', function(data){
-      if (/Watching/.test(data)) {
-        assert.equal(data.trim(), 'Watching "example/foo.less" : 1 file');
-        process.nextTick(function(){
-          exec('echo "* { color: black }" > example/foo.less');
-        });
-      }
-
-      if (/^lessc/.test(data)) {
-        assert.include(data, 'lessc: wrote');
-        done();
-      }
+    sut.on('close', function() {
+      assert.strictEqual(stderr, '');
+      assert.strictEqual(state, 'DONE');
+      done();
     });
   });
 
   it('should handle mixed quotations of diffrent types correctly', function(done) {
-    var cmd = './bin/cmd.js -p example/foo.less -- node -e \'console.log("blorp");\'';
-    var child = exec(cmd, function(err, stdout, stderr){
-      if (err) {
-        assert.notOk(err, err);
-        done();
+    var PATTERN = 'example/*.less';
+    var state = ''
+    var stdout = '';
+    var stderr = '';
+    var sut = spawn('node', [CLI, '--pattern', PATTERN, '--', 'node', '-e', 'console.log("blorp");']);
+    sut.stderr.on('data', function(data) {
+      stderr += String(data);
+    });
+    sut.stdout.on('data', function(data) {
+      stdout += String(data);
+      switch(state) {
+      case '':
+        if (/Watching/.test(stdout)) {
+          state = 'Watching';
+          process.nextTick(function() {
+            exec('echo "* { color: black }" > example/foo.less');
+          });
+        }
+      case 'Watching':
+        if (/Running/.test(stdout)) {
+          state = 'Running';
+        }
+      case 'Running':
+        if (/blorp[^]*blorp/.test(stdout)) {
+          state = 'DONE';
+          sut.kill('SIGTERM');
+        }
       }
     });
-
-    child.stdout.on('data', function(data){
-      if (/Watching/.test(data)) {
-        process.nextTick(function(){
-          exec('echo "* { color: black }" > example/foo.less');
-        });
-      }
-
-      if (/^blorp\n/.test(data)) {
-        done();
-      }
+    sut.on('close', function() {
+      assert.strictEqual(stderr, '');
+      assert.strictEqual(state, 'DONE');
+      done();
     });
   });
 });
