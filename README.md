@@ -10,9 +10,7 @@ command when files change. Like
 ## Installation
 
 ```shell
-$ npm install --save-dev gazer-color
-# or
-$ npm install -g gazer-color
+$ npm install gazer-color
 ```
 
 ## Usage
@@ -28,13 +26,7 @@ $ gazer-color --pattern README.md -- echo blorp
 
 ### Multiple patterns
 
-[gaze](https://github.com/shama/gaze#usage) accepts an array of patterns, so do `gazer-color`.
-
-```javascript
-gaze(['**/*.js', '!node_modules/**/*'], function() {
-  console.log('blorp');
-});
-```
+[gaze](https://github.com/shama/gaze#usage) accepts an array of patterns, so does `gazer-color`:
 
 ```shell
 $ gazer-color --pattern '**/*.js' --pattern '!node_modules/**/*' -- echo blorp
