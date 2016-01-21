@@ -37,7 +37,7 @@ gaze(['**/*.js', '!node_modules/**/*'], function() {
 ```
 
 ```shell
-$ gazer-color --pattern "**/*.js" --pattern "!node_modules/**/*" -- echo blorp
+$ gazer-color --pattern '**/*.js' --pattern '!node_modules/**/*' -- echo blorp
 
 [index.js changes]
 
