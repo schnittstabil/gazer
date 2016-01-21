@@ -60,6 +60,28 @@ describe('gazer-color', function() {
     }
   });
 
+  it('should output exit code in verbose mode', function(done) {
+    var listener = new Listener('node',
+      [CLI, '-v', '--pattern', 'fixtures/*.less', '--', 'echo', 'blorp'],
+      function() {
+        assert.ok(/exited with code 0$/m.exec(this.capture.stderr.trim()));
+        assert.strictEqual(this.state, 'Closing');
+        done();
+      }
+    );
+    listener.onWatching = function() {
+      process.nextTick(function() {
+        exec('echo "* { color: black }" > fixtures/foo.less');
+      });
+    }
+    listener.onRunning = function() {
+      if (/exited/m.test(this.capture.stderr)) {
+        this.state = 'Closing';
+        listener.sut.kill();
+      }
+    }
+  });
+
   it('should handle mixed quotations of diffrent types correctly', function(done) {
     var listener = new Listener('node',
       [CLI, '--pattern', 'fixtures/*.less', '--', 'node', '-e', 'console.log(\'blorp\');'],

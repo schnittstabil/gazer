@@ -25,7 +25,14 @@ function Runner(cmd, args, opts) {
 
   this.spawn = function() {
     npmlog.info('gazer-color', 'Running `%s`', spawnArgsLogString);
-    spawn.apply(null, spawnArgs);
+
+    var child = spawn.apply(null, spawnArgs);
+
+    if (opts.verbose) {
+      child.on('close', function (code) {
+        npmlog.info('gazer-color', '`%s` exited with code %d', spawnArgsLogString, code);
+      });
+    }
   }
 
   this.run = debounce(this.spawn, wait);

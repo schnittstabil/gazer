@@ -3,7 +3,9 @@
 var gazer = require('./');
 
 var argv = require('yargs')
-  .usage('Usage: gazer -p "**/*.js" -- <your command>')
+  .usage('Usage: gazer -v -p \'**/*.js\' -- <your command>')
+  .alias('v', 'verbose')
+  .describe('v', 'Turn on verbose output')
   .demand('p')
   .alias('p', 'pattern')
   .describe('p', 'Files to watch, globbing supported')
@@ -17,6 +19,7 @@ var opts = argv;
 
 // delete non gazer options
 delete opts.pattern;
+delete opts.v;
 delete opts.p;
 delete opts._;
 delete opts.$0;
