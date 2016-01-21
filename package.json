@@ -19,13 +19,13 @@
   ],
   "license": "BSD-2-Clause",
   "dependencies": {
-    "gaze": "^0.5.1",
-    "lodash.debounce": "^3.0.1",
-    "npmlog": "^1.2.0",
-    "yargs": "^3.5.3"
+    "gaze": "^0.5.2",
+    "lodash.debounce": "^4.0.0",
+    "npmlog": "^2.0.0",
+    "yargs": "^3.32.0"
   },
   "devDependencies": {
-    "mocha": "^2.2.1"
+    "mocha": "^2.3.4"
   },
   "directories": {
     "example": "example",
