@@ -1,12 +1,13 @@
 #!/usr/bin/env node
-var gazer = require('../');
+'use strict';
+var gazer = require('./');
 
 var argv = require('yargs')
   .usage('Usage: gazer -p "**/*.js" -- <your command>')
   .demand('p')
-  .demand(1, 'You must provide a command to run')
   .alias('p', 'pattern')
   .describe('p', 'Files to watch, globbing supported')
+  .demand(1, 'You must provide a command to run')
   .argv;
 
 var pattern = argv.pattern;
@@ -20,4 +21,4 @@ delete opts.p;
 delete opts._;
 delete opts.$0;
 
-gazer(pattern, cmd, args, opts);
+gazer([].concat(pattern), cmd, args, opts);

@@ -4,11 +4,11 @@
   "description": "Watch some files, do a thing - a gazer fork capable of color output",
   "main": "index.js",
   "bin": {
-    "gazer-color": "bin/cmd.js"
+    "gazer-color": "cli.js"
   },
   "scripts": {
     "test": "mocha test --timeout 20000",
-    "watch-test": "node bin/cmd.js -p \"**/*\" -p \"!node_modules/**/*\" -p \"!example/**/*\" -- npm run test"
+    "watch-test": "node ./cli.js -p \"**/*\" -p \"!node_modules/**/*\" -p \"!example/**/*\" -- npm run test"
   },
   "author": "wookiehangover",
   "contributors": [
@@ -26,10 +26,6 @@
   },
   "devDependencies": {
     "mocha": "^2.3.4"
-  },
-  "directories": {
-    "example": "example",
-    "test": "test"
   },
   "repository": {
     "type": "git",
