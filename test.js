@@ -1,106 +1,96 @@
-var assert = require('assert');
-var childProcess = require('child_process');
-var exec = childProcess.exec;
-var spawn = childProcess.spawn;
-var CLI = './cli.js';
+import test from 'ava';
+import childProcess from 'child_process';
 
-function Listener(cmd, args, onClose) {
-  this.capture = {
-    stderr: '',
-    stdout: '',
-  };
-  this.state = '';
-  this.sut = spawn(cmd, args);
-  this.sut.stderr.on('data', this.listen.bind(this, 'stderr'));
-  this.sut.stdout.on('data', this.listen.bind(this, 'stdout'));
-  this.sut.on('close', onClose.bind(this));
+const exec = childProcess.exec;
+const CLI = './cli.js';
+
+function Listener() {
+	this.capture = {stderr: '', stdout: ''};
+	this.state = '';
 }
 
-Listener.prototype.listen = function(stream, data) {
-  this.capture[stream] += String(data);
-  if (this.state === '') {
-    if (/Watching/.test(this.capture.stderr)) {
-      this.state = 'Watching';
-      if (this.onWatching) {
-        this.onWatching();
-      }
-    }
-  }
-  if(this.state === 'Watching') {
-    if (/Running/.test(this.capture.stderr)) {
-      this.state = 'Running';
-    }
-  }
-  if (this.state === 'Running' && this.onRunning) {
-    this.onRunning();
-  }
-}
+Listener.prototype.spawnCli = function () {
+	var args = Object.assign([], arguments);
+	return new Promise((resolve, reject) => {
+		this.sut = childProcess.spawn('node', [CLI].concat(args));
+		this.sut.stderr.on('data', this.listen.bind(this, 'stderr'));
+		this.sut.stdout.on('data', this.listen.bind(this, 'stdout'));
+		this.sut.on('close', (code, signal) => {
+			resolve(this, code, signal);
+		});
+		this.sut.on('error', err => reject(err));
+	});
+};
 
-describe('gazer-color', function() {
+Listener.prototype.listen = function (stream, data) {
+	this.capture[stream] += String(data);
+	if (this.state === '') {
+		if (/Watching/.test(this.capture.stderr)) {
+			this.state = 'Watching';
+			this.onWatching();
+		}
+	}
+	if (this.state === 'Watching') {
+		if (/Running/.test(this.capture.stderr)) {
+			this.state = 'Running';
+		}
+	}
+	if (this.state === 'Running') {
+		this.onRunning();
+	}
+};
 
-  it('should watch files and run a command', function(done) {
-    var listener = new Listener('node',
-      [CLI, '--pattern', 'fixtures/*.less', '--', 'echo', 'blorp'],
-      function() {
-        assert.strictEqual(this.capture.stdout.trim(), 'blorp');
-        assert.strictEqual(this.state, 'Closing');
-        done();
-      }
-    );
-    listener.onWatching = function() {
-      process.nextTick(function() {
-        exec('echo "* { color: black }" > fixtures/foo.less');
-      });
-    }
-    listener.onRunning = function() {
-      if (/^blorp$/m.test(this.capture.stdout)) {
-        this.state = 'Closing';
-        this.sut.kill();
-      }
-    }
-  });
+Listener.prototype.close = function () {
+	this.state = 'Closing';
+	this.sut.kill();
+};
 
-  it('should output exit code in verbose mode', function(done) {
-    var listener = new Listener('node',
-      [CLI, '-v', '--pattern', 'fixtures/*.less', '--', 'echo', 'blorp'],
-      function() {
-        assert.ok(/exited with code 0$/m.exec(this.capture.stderr.trim()));
-        assert.strictEqual(this.state, 'Closing');
-        done();
-      }
-    );
-    listener.onWatching = function() {
-      process.nextTick(function() {
-        exec('echo "* { color: black }" > fixtures/foo.less');
-      });
-    }
-    listener.onRunning = function() {
-      if (/exited/m.test(this.capture.stderr)) {
-        this.state = 'Closing';
-        listener.sut.kill();
-      }
-    }
-  });
+Listener.prototype.onWatching = () => {
+	process.nextTick(exec.bind(null, 'echo "* { color: black }" > fixtures/foo.less'));
+};
 
-  it('should handle mixed quotations of diffrent types correctly', function(done) {
-    var listener = new Listener('node',
-      [CLI, '--pattern', 'fixtures/*.less', '--', 'node', '-e', 'console.log(\'blorp\');'],
-      function() {
-        assert.strictEqual(this.capture.stdout.trim(), 'blorp');
-        assert.strictEqual(this.state, 'Closing');
-        done();
-      }
-    );
-    listener.onWatching = function() {
-      process.nextTick(function() {
-        exec('echo "* { color: black }" > fixtures/foo.less');
-      });
-    }
-    listener.onRunning = function() {
-      if (/^blorp$/m.test(this.capture.stdout)) {
-        this.state = 'Closing';
-        this.sut.kill();
-      }
-    }
-  });
+test('watch files and run a command', async t => {
+	const listener = new Listener();
+
+	listener.onRunning = function () {
+		if (/^blorp$/m.test(this.capture.stdout)) {
+			this.close();
+		}
+	};
+
+	await listener.spawnCli('--pattern', 'fixtures/*.less', '--', 'echo', 'blorp');
+
+	t.is(listener.capture.stdout.trim(), 'blorp');
+	t.is(listener.state, 'Closing');
+});
+
+test('output exit code in verbose mode', async t => {
+	const listener = new Listener();
+
+	listener.onRunning = function () {
+		if (/exited/m.test(this.capture.stderr)) {
+			this.close();
+		}
+	};
+
+	await listener.spawnCli('-v', '--pattern', 'fixtures/*.less', '--', 'echo', 'blorp');
+
+	t.ok(/exited with code 0$/m.exec(listener.capture.stderr.trim()));
+	t.is(listener.state, 'Closing');
+});
+
+test('handle mixed quotations of diffrent types correctly', async t => {
+	const listener = new Listener();
+
+	listener.onRunning = function () {
+		if (/^blorp$/m.test(this.capture.stdout)) {
+			this.state = 'Closing';
+			this.sut.kill();
+		}
+	};
+
+	await listener.spawnCli('--pattern', 'fixtures/*.less', '--', 'node', '-e', 'console.log(\'blorp\');');
+
+	t.is(listener.capture.stdout.trim(), 'blorp');
+	t.is(listener.state, 'Closing');
 });
