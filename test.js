@@ -15,9 +15,8 @@ Listener.prototype.spawnCli = function () {
 		this.sut = childProcess.spawn('node', [CLI].concat(args));
 		this.sut.stderr.on('data', this.listen.bind(this, 'stderr'));
 		this.sut.stdout.on('data', this.listen.bind(this, 'stdout'));
-		this.sut.on('close', (code, signal) => {
-			resolve(this, code, signal);
-		});
+		this.sut.on('close', resolve.bind(resolve, this));
+		this.sut.on('exit', resolve.bind(resolve, this));
 		this.sut.on('error', err => reject(err));
 	});
 };
@@ -42,7 +41,7 @@ Listener.prototype.listen = function (stream, data) {
 
 Listener.prototype.close = function () {
 	this.state = 'Closing';
-	this.sut.kill();
+	this.sut.kill('SIGKILL');
 };
 
 Listener.prototype.onWatching = () => {
@@ -84,8 +83,7 @@ test('handle mixed quotations of diffrent types correctly', async t => {
 
 	listener.onRunning = function () {
 		if (/^blorp$/m.test(this.capture.stdout)) {
-			this.state = 'Closing';
-			this.sut.kill();
+			this.close();
 		}
 	};
 
