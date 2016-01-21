@@ -1,4 +1,4 @@
-# A Gazer fork capable of color output
+# A Gazer fork capable of color output [![Build Status](https://travis-ci.org/schnittstabil/gazer-color.svg?branch=master)](https://travis-ci.org/schnittstabil/gazer-color)
 
 > Watch some files, do a thing
 
