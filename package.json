@@ -19,7 +19,7 @@
   ],
   "license": "BSD-2-Clause",
   "dependencies": {
-    "gaze": "^0.5.2",
+    "gaze": "^1.1.0",
     "lodash.debounce": "^4.0.0",
     "npmlog": "^2.0.0",
     "yargs": "^3.32.0"
