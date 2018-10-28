@@ -1,4 +1,4 @@
-# A Gazer fork capable of color output [![Build Status](https://travis-ci.org/schnittstabil/gazer-color.svg?branch=master)](https://travis-ci.org/schnittstabil/gazer-color) [![Build status Windows](https://ci.appveyor.com/api/projects/status/0m92t15s7tpddwfm?svg=true)](https://ci.appveyor.com/project/schnittstabil/gazer-color)
+# A Gazer fork capable of color output [![Build Status](https://travis-ci.org/schnittstabil/gazer-color.svg?branch=master)](https://travis-ci.org/schnittstabil/gazer-color) [![Build status Windows](https://ci.appveyor.com/api/projects/status/d8x0r04tcqpes7gi/branch/master?svg=true)](https://ci.appveyor.com/project/schnittstabil/gazer-color/branch/master)
 
 
 > Watch some files, do a thing
