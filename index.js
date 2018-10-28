@@ -1,25 +1,25 @@
 'use strict';
-var path = require('path');
+const path = require('path');
 
-var gaze = require('gaze');
-var npmlog = require('npmlog');
+const gaze = require('gaze');
+const npmlog = require('npmlog');
 
-var Runner = require('./runner');
+const Runner = require('./runner');
 
 module.exports = function (patterns, cmd, args, opts) {
 	opts = opts || {};
-	var runner = new Runner(cmd, args, opts);
+	const runner = new Runner(cmd, args, opts);
 
 	gaze(patterns, opts, function (err) {
 		if (err) {
 			throw new Error(err);
 		}
 
-		var fileCount = Object.keys(this.watched()).length;
+		const fileCount = Object.keys(this.watched()).length;
 
 		npmlog.info('gazer-color', 'Watching %d file[s] (%s)', fileCount, patterns.join(', '));
 
-		this.on('all', function (event, filepath) {
+		this.on('all', (event, filepath) => {
 			filepath = path.relative(process.cwd(), filepath);
 			npmlog.info('gazer-color', '`%s` %s', filepath, event);
 			runner.run();

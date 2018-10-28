@@ -1,11 +1,11 @@
 'use strict';
-var spawn = require('child_process').spawn;
+const {spawn} = require('child_process');
 
-var debounce = require('lodash.debounce');
-var npmlog = require('npmlog');
+const debounce = require('lodash.debounce');
+const npmlog = require('npmlog');
 
 function sanitizeSpawnArgs(cmd, args) {
-	var spawnOpts = {stdio: 'inherit'};
+	const spawnOpts = {stdio: 'inherit'};
 
 	if (process.platform === 'win32') {
 		args = ['/c', '"' + cmd + '"'].concat(args);
@@ -17,19 +17,19 @@ function sanitizeSpawnArgs(cmd, args) {
 }
 
 function Runner(cmd, args, opts) {
-	var wait = 100; // debounce: the number of milliseconds to delay
-	var spawnArgs = sanitizeSpawnArgs(cmd, args);
-	var spawnArgsLogString = [spawnArgs[0]].concat(spawnArgs[1]).join(' ');
+	const wait = 100; // Debounce: the number of milliseconds to delay
+	const spawnArgs = sanitizeSpawnArgs(cmd, args);
+	const spawnArgsLogString = [spawnArgs[0]].concat(spawnArgs[1]).join(' ');
 
 	opts = opts || {};
 
 	this.spawn = function () {
 		npmlog.info('gazer-color', 'Running `%s`', spawnArgsLogString);
 
-		var child = spawn.apply(null, spawnArgs);
+		const child = spawn(...spawnArgs);
 
 		if (opts.verbose) {
-			child.on('close', function (code) {
+			child.on('close', code => {
 				npmlog.info('gazer-color', '`%s` exited with code %d', spawnArgsLogString, code);
 			});
 		}

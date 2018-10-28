@@ -1,7 +1,8 @@
-import test from 'ava';
 import childProcess from 'child_process';
 
-const exec = childProcess.exec;
+import test from 'ava';
+
+const {exec} = childProcess;
 const CLI = './cli.js';
 
 function Listener() {
@@ -9,8 +10,7 @@ function Listener() {
 	this.state = '';
 }
 
-Listener.prototype.spawnCli = function () {
-	var args = Object.assign([], arguments);
+Listener.prototype.spawnCli = function (...args) {
 	return new Promise((resolve, reject) => {
 		this.sut = childProcess.spawn('node', [CLI].concat(args));
 		this.sut.stderr.on('data', this.listen.bind(this, 'stderr'));
@@ -74,7 +74,8 @@ test('output exit code in verbose mode', async t => {
 
 	await listener.spawnCli('-v', '--pattern', 'fixtures/*.less', '--', 'echo', 'blorp');
 
-	t.ok(/exited with code 0$/m.exec(listener.capture.stderr.trim()));
+	const stderr = listener.capture.stderr.trim();
+	t.regex(stderr, /exited with code 0$/m);
 	t.is(listener.state, 'Closing');
 });
 
