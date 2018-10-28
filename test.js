@@ -52,7 +52,7 @@ test('watch files and run a command', async t => {
 	const listener = new Listener();
 
 	listener.onRunning = function () {
-		if (this.capture.stdout.trim() === 'blorp') {
+		if (/^blorp$/m.test(this.capture.stdout)) {
 			this.close();
 		}
 	};
@@ -83,7 +83,7 @@ test('handle mixed quotations of diffrent types correctly', async t => {
 	const listener = new Listener();
 
 	listener.onRunning = function () {
-		if (this.capture.stdout.trim() === 'blorp') {
+		if (/^blorp$/m.test(this.capture.stdout)) {
 			this.close();
 		}
 	};

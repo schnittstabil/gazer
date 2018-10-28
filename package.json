@@ -28,7 +28,7 @@
     "yargs": "^12.0.2"
   },
   "devDependencies": {
-    "ava": "^0.25.0",
+    "ava": "1.0.0-rc.1",
     "xo": "^0.23.0"
   },
   "repository": {
